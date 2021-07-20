@@ -6,13 +6,14 @@ export class EmployeesController{
 
     constructor(private readonly employeesService: EmployeesService){}
     @Post()
-    addEmployee(
-        @Body('firstname') empfirstname:string, 
-        @Body('lastname') emplastname:string,
-        @Body('companyname') empcompanyname:string,
-        @Body('contact') empcontact:number
+    async addEmployee(
+         @Body('firstname') empfirstname:string, 
+         @Body('lastname') emplastname:string,
+         @Body('companyname') empcompanyname:string,
+         @Body('contact') empcontact:number
+        
         ) {
-        const generatedId = this.employeesService.insertEmployee(
+        const generatedId = await this.employeesService.insertEmployee(
             empfirstname,
             emplastname,
             empcompanyname,
@@ -22,8 +23,9 @@ export class EmployeesController{
     }
 
     @Get()
-    getAllEmployees(){
-        return this.employeesService.getEmployees();
+    async getAllEmployees(){
+       const employees = await this.employeesService.getEmployees();
+       return employees;
     }
 
     @Get(':id')
@@ -33,15 +35,15 @@ export class EmployeesController{
 
 
     @Patch(':id')
-    updateEmployee(@Param('id') empId:string, @Body('firstname') empfirstname:string, @Body('lastname') emplastname:string , @Body('companyname') empcompanyname:string, @Body('contact') empcontact:number) {
-        this.employeesService.updateEmployee(empId,empfirstname,emplastname,empcompanyname,empcontact);
+    async updateEmployee(@Param('id') empId:string, @Body('firstname') empfirstname:string, @Body('lastname') emplastname:string , @Body('companyname') empcompanyname:string, @Body('contact') empcontact:number) {
+        await this.employeesService.updateEmployee(empId,empfirstname,emplastname,empcompanyname,empcontact);
         return null;
     }
 
 
     @Delete(':id')
-    removeEmployee(@Param('id') empId:string){
-        this.employeesService.deleteEmployee(empId);
+    async removeEmployee(@Param('id') empId:string){
+        await this.employeesService.deleteEmployee(empId);
         return null;
     }
 }

@@ -1,32 +1,61 @@
 import { Injectable , NotAcceptableException, NotFoundException} from "@nestjs/common";
 import { Employee } from "./employee.model";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
 
 @Injectable()
 
 export class EmployeesService{
    private employees: Employee[] = [];
 
-    insertEmployee(firstname:string, lastname:string, companyname: string, contact:number){
-        const empId = Math.random().toString();
-        const newEmployee = new Employee(empId, firstname,lastname,companyname,contact);
-        this.employees.push(newEmployee);
-        return empId;
+   constructor(
+       @InjectModel('Employee') private readonly employeeModel: Model<Employee>
+       ) {}
+
+    async insertEmployee(firstname:string, lastname:string, companyname: string, contact:number){
+        const newEmployee = new this.employeeModel({
+            firstname:firstname, 
+            lastname:lastname,
+            companyname:companyname,
+            contact:contact
+        });
+
+        const result = await newEmployee.save();
+        return result.id as string;
     }
     
-    getEmployees(){
-        return [...this.employees];
+    async getEmployees(){
+       const employees = await this.employeeModel.find().exec();
+        return employees.map((emp)=> ({
+            id:emp.id, 
+            firstname:emp.firstname,
+            lastname:emp.lastname,
+            companyname:emp.companyname,
+            contact:emp.contact,
+        }));
     }
 
 
-    getSingleEmployee(employeeId:string){
-        const employee = this.findEmployee(employeeId)[0];
-        return {...employee};
+    async getSingleEmployee(employeeId:string){
+        const employee = await this.findEmployee(employeeId);
+        return {
+            id:employee.id, 
+            firstname:employee.firstname, 
+            lastname:employee.lastname, 
+            companyname:employee.companyname, 
+            contact:employee.contact};
     }
 
 
-    updateEmployee(employeeId:string, firstname:string, lastname:string, companyname:string, contact:number){
-        const [employee, index] = this.findEmployee(employeeId);
-        const updatedEmployee = {...employee};
+    async updateEmployee(
+        employeeId:string, 
+        firstname:string, 
+        lastname:string, 
+        companyname:string, 
+        contact:number){
+        const updatedEmployee = await this.findEmployee(employeeId);
+    
+       
         if(firstname){
             updatedEmployee.firstname = firstname;
         }
@@ -39,22 +68,26 @@ export class EmployeesService{
         if(contact){
             updatedEmployee.contact = contact;
         }
-        this.employees[index] = updatedEmployee;
+        updatedEmployee.save();   
+     }
+
+   async deleteEmployee(empId:string) {
+      await this.employeeModel.deleteOne({_id:empId}).exec();
     }
 
-    deleteEmployee(empId:string) {
-        const index = this.findEmployee(empId)[1];
-        this.employees.splice(index, 1)
-    }
 
-
-    private findEmployee(id:string):[Employee, number] {
-        const employeeIndex = this.employees.findIndex((emp) => emp.id == id);
-        const employee = this.employees[employeeIndex];
+    private async findEmployee(id:string): Promise<Employee> {
+        let employee;
+        try{
+           employee = await this.employeeModel.findById(id).exec();
+        }
+        catch(error){
+            throw new NotFoundException('Not find employee');
+        }
         if(!employee){
             throw new NotFoundException('Not find employee');
         }
-        return [employee, employeeIndex];
+        return employee;
     }
 
 
