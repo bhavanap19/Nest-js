@@ -7,16 +7,16 @@ export class EmployeesController{
     constructor(private readonly employeesService: EmployeesService){}
     @Post()
     async addEmployee(
-         @Body('firstname') empfirstname:string, 
-         @Body('lastname') emplastname:string,
-         @Body('companyname') empcompanyname:string,
+         @Body('firstName') empfirstName:string, 
+         @Body('lastName') emplastName:string,
+         @Body('companyName') empcompanyName:string,
          @Body('contact') empcontact:number
         
         ) {
         const generatedId = await this.employeesService.insertEmployee(
-            empfirstname,
-            emplastname,
-            empcompanyname,
+            empfirstName,
+            emplastName,
+            empcompanyName,
             empcontact
             );
             return {id:generatedId};
@@ -35,8 +35,8 @@ export class EmployeesController{
 
 
     @Patch(':id')
-    async updateEmployee(@Param('id') empId:string, @Body('firstname') empfirstname:string, @Body('lastname') emplastname:string , @Body('companyname') empcompanyname:string, @Body('contact') empcontact:number) {
-        await this.employeesService.updateEmployee(empId,empfirstname,emplastname,empcompanyname,empcontact);
+    async updateEmployee(@Param('id') empId:string, @Body('firstName') empfirstName:string, @Body('lastName') emplastName:string , @Body('companyName') empcompanyName:string, @Body('contact') empcontact:number) {
+        await this.employeesService.updateEmployee(empId,empfirstName,emplastName,empcompanyName,empcontact);
         return null;
     }
 

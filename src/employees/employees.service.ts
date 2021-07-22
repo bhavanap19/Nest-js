@@ -4,7 +4,6 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
 @Injectable()
-
 export class EmployeesService{
    private employees: Employee[] = [];
 
@@ -12,11 +11,11 @@ export class EmployeesService{
        @InjectModel('Employee') private readonly employeeModel: Model<Employee>
        ) {}
 
-    async insertEmployee(firstname:string, lastname:string, companyname: string, contact:number){
+    async insertEmployee(firstName:string, lastName:string, companyName: string, contact:number){
         const newEmployee = new this.employeeModel({
-            firstname:firstname, 
-            lastname:lastname,
-            companyname:companyname,
+            firstName:firstName, 
+            lastName:lastName,
+            companyName:companyName,
             contact:contact
         });
 
@@ -28,9 +27,9 @@ export class EmployeesService{
        const employees = await this.employeeModel.find().exec();
         return employees.map((emp)=> ({
             id:emp.id, 
-            firstname:emp.firstname,
-            lastname:emp.lastname,
-            companyname:emp.companyname,
+            firstName:emp.firstName,
+            lastName:emp.lastName,
+            companyName:emp.companyName,
             contact:emp.contact,
         }));
     }
@@ -40,30 +39,30 @@ export class EmployeesService{
         const employee = await this.findEmployee(employeeId);
         return {
             id:employee.id, 
-            firstname:employee.firstname, 
-            lastname:employee.lastname, 
-            companyname:employee.companyname, 
+            firstName:employee.firstName, 
+            lastName:employee.lastName, 
+            companyName:employee.companyName, 
             contact:employee.contact};
     }
 
 
     async updateEmployee(
         employeeId:string, 
-        firstname:string, 
-        lastname:string, 
-        companyname:string, 
+        firstName:string, 
+        lastName:string, 
+        companyName:string, 
         contact:number){
         const updatedEmployee = await this.findEmployee(employeeId);
     
        
-        if(firstname){
-            updatedEmployee.firstname = firstname;
+        if(firstName){
+            updatedEmployee.firstName = firstName;
         }
-        if(lastname){
-            updatedEmployee.lastname = lastname;
+        if(lastName){
+            updatedEmployee.lastName = lastName;
         }
-        if(companyname){
-            updatedEmployee.companyname = companyname;
+        if(companyName){
+            updatedEmployee.companyName = companyName;
         }
         if(contact){
             updatedEmployee.contact = contact;
